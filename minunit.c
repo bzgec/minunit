@@ -73,7 +73,7 @@ extern "C" {
 
 /*  Misc. counters */
 int minunit_run = 0;
-int minunit_assert = 0;
+int minunit_suites = 0;
 int minunit_fail = 0;
 int minunit_status = 0;
 
