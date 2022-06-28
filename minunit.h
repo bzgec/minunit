@@ -187,6 +187,19 @@ extern void (*minunit_teardown)(void);
         return;                                  \
     })
 
+#define ASSERT_LE(inParam1, inParam2, message)   \
+    MU__SAFE_BLOCK(if(!(inParam1 <= inParam2)) { \
+        snprintf(minunit_last_message,           \
+                 MINUNIT_MESSAGE_LEN,            \
+                 "%s failed:\n\t%s:%d: %s",      \
+                 __func__,                       \
+                 __FILE__,                       \
+                 __LINE__,                       \
+                 message);                       \
+        minunit_status = 1;                      \
+        return;                                  \
+    })
+
 #define mu_assert(test, message)            \
     MU__SAFE_BLOCK(if(!(test)) {            \
         snprintf(minunit_last_message,      \
@@ -234,6 +247,24 @@ extern void (*minunit_teardown)(void);
                        minunit_status = 1;                                                 \
                        return;                                                             \
                    })
+
+#define ASSERT_STREQ(expected, result)                                                \
+    MU__SAFE_BLOCK(                                                                   \
+        const char *minunit_tmp_e = expected; const char *minunit_tmp_r = result;     \
+        if(!minunit_tmp_e) { minunit_tmp_e = "<null pointer>"; } if(!minunit_tmp_r) { \
+            minunit_tmp_r = "<null pointer>";                                         \
+        } if(strcmp(minunit_tmp_e, minunit_tmp_r)) {                                  \
+            snprintf(minunit_last_message,                                            \
+                     MINUNIT_MESSAGE_LEN,                                             \
+                     "%s failed:\n\t%s:%d: '%s' expected but was '%s'",               \
+                     __func__,                                                        \
+                     __FILE__,                                                        \
+                     __LINE__,                                                        \
+                     minunit_tmp_e,                                                   \
+                     minunit_tmp_r);                                                  \
+            minunit_status = 1;                                                       \
+            return;                                                                   \
+        })
 
 #define mu_assert_string_eq(expected, result)                                         \
     MU__SAFE_BLOCK(                                                                   \
