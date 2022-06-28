@@ -161,6 +161,32 @@ extern void (*minunit_teardown)(void);
                    minunit_status = 1;                 \
                    return;)
 
+#define ASSERT_EQ(inParam1, inParam2, message)   \
+    MU__SAFE_BLOCK(if(!(inParam1 == inParam2)) { \
+        snprintf(minunit_last_message,           \
+                 MINUNIT_MESSAGE_LEN,            \
+                 "%s failed:\n\t%s:%d: %s",      \
+                 __func__,                       \
+                 __FILE__,                       \
+                 __LINE__,                       \
+                 message);                       \
+        minunit_status = 1;                      \
+        return;                                  \
+    })
+
+#define ASSERT_NE(inParam1, inParam2, message)   \
+    MU__SAFE_BLOCK(if(!(inParam1 != inParam2)) { \
+        snprintf(minunit_last_message,           \
+                 MINUNIT_MESSAGE_LEN,            \
+                 "%s failed:\n\t%s:%d: %s",      \
+                 __func__,                       \
+                 __FILE__,                       \
+                 __LINE__,                       \
+                 message);                       \
+        minunit_status = 1;                      \
+        return;                                  \
+    })
+
 #define mu_assert(test, message)            \
     MU__SAFE_BLOCK(if(!(test)) {            \
         snprintf(minunit_last_message,      \
