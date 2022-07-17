@@ -200,6 +200,21 @@ extern void (*minunit_teardown)(void);
         return;                                  \
     })
 
+// Verifies that the difference between inParam1 and inParam2 does not exceed the absolute error
+// bound inAbsErr.
+#define ASSERT_NEAR(inParam1, inParam2, inAbsErr, message)             \
+    MU__SAFE_BLOCK(if(!(inAbsErr > fabs(1.0 * inParam1 - inParam2))) { \
+        snprintf(minunit_last_message,                                 \
+                 MINUNIT_MESSAGE_LEN,                                  \
+                 "%s failed:\n\t%s:%d: %s",                            \
+                 __func__,                                             \
+                 __FILE__,                                             \
+                 __LINE__,                                             \
+                 message);                                             \
+        minunit_status = 1;                                            \
+        return;                                                        \
+    })
+
 #define mu_assert(test, message)            \
     MU__SAFE_BLOCK(if(!(test)) {            \
         snprintf(minunit_last_message,      \
