@@ -111,15 +111,23 @@ extern void (*minunit_teardown)(void);
         printf("."); if(minunit_real_timer == 0 && minunit_proc_timer == 0) { \
             minunit_real_timer = mu_timer_real();                             \
             minunit_proc_timer = mu_timer_cpu();                              \
-        } if(minunit_setup)(*minunit_setup)();                                \
+        };                                                                    \
         minunit_status = 0;                                                   \
-        test();                                                               \
         minunit_run++;                                                        \
+        if(minunit_setup) { (*minunit_setup)(); };                            \
         if(minunit_status) {                                                  \
             minunit_fail++;                                                   \
             printf("F");                                                      \
             printf("\n%s\n", minunit_last_message);                           \
-        } fflush(stdout);                                                     \
+        } else {                                                              \
+            test();                                                           \
+            if(minunit_status) {                                              \
+                minunit_fail++;                                               \
+                printf("F");                                                  \
+                printf("\n%s\n", minunit_last_message);                       \
+            };                                                                \
+        };                                                                    \
+        fflush(stdout);                                                       \
         if(minunit_teardown)(*minunit_teardown)();)
 
 /*  Report */
