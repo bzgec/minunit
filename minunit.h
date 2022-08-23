@@ -35,7 +35,7 @@ extern "C" {
 #endif
 
 #elif defined(__unix__) || defined(__unix) || defined(unix) \
-    || (defined(__APPLE__) && defined(__MACH__))
+        || (defined(__APPLE__) && defined(__MACH__))
 
 /* Change POSIX C SOURCE version for pure c99 compilers */
 #if !defined(_POSIX_C_SOURCE) || _POSIX_C_SOURCE < 200112L
@@ -106,29 +106,29 @@ extern void (*minunit_teardown)(void);
     MU__SAFE_BLOCK(minunit_setup = setup_fun; minunit_teardown = teardown_fun;)
 
 /*  Test runner */
-#define MU_RUN_TEST(test)                                                     \
-    MU__SAFE_BLOCK(                                                           \
-        printf("."); if(minunit_real_timer == 0 && minunit_proc_timer == 0) { \
-            minunit_real_timer = mu_timer_real();                             \
-            minunit_proc_timer = mu_timer_cpu();                              \
-        };                                                                    \
-        minunit_status = 0;                                                   \
-        minunit_run++;                                                        \
-        if(minunit_setup) { (*minunit_setup)(); };                            \
-        if(minunit_status) {                                                  \
-            minunit_fail++;                                                   \
-            printf("F");                                                      \
-            printf("\n%s\n", minunit_last_message);                           \
-        } else {                                                              \
-            test();                                                           \
-            if(minunit_status) {                                              \
-                minunit_fail++;                                               \
-                printf("F");                                                  \
-                printf("\n%s\n", minunit_last_message);                       \
-            };                                                                \
-        };                                                                    \
-        fflush(stdout);                                                       \
-        if(minunit_teardown)(*minunit_teardown)();)
+#define MU_RUN_TEST(test)                                                         \
+    MU__SAFE_BLOCK(                                                               \
+            printf("."); if(minunit_real_timer == 0 && minunit_proc_timer == 0) { \
+                minunit_real_timer = mu_timer_real();                             \
+                minunit_proc_timer = mu_timer_cpu();                              \
+            };                                                                    \
+            minunit_status = 0;                                                   \
+            minunit_run++;                                                        \
+            if(minunit_setup) { (*minunit_setup)(); };                            \
+            if(minunit_status) {                                                  \
+                minunit_fail++;                                                   \
+                printf("F");                                                      \
+                printf("\n%s\n", minunit_last_message);                           \
+            } else {                                                              \
+                test();                                                           \
+                if(minunit_status) {                                              \
+                    minunit_fail++;                                               \
+                    printf("F");                                                  \
+                    printf("\n%s\n", minunit_last_message);                       \
+                };                                                                \
+            };                                                                    \
+            fflush(stdout);                                                       \
+            if(minunit_teardown)(*minunit_teardown)();)
 
 /*  Report */
 #define MU_REPORT()                                                                    \
@@ -208,6 +208,45 @@ extern void (*minunit_teardown)(void);
         return;                                  \
     })
 
+#define ASSERT_LT(inParam1, inParam2, message)  \
+    MU__SAFE_BLOCK(if(!(inParam1 < inParam2)) { \
+        snprintf(minunit_last_message,          \
+                 MINUNIT_MESSAGE_LEN,           \
+                 "%s failed:\n\t%s:%d: %s",     \
+                 __func__,                      \
+                 __FILE__,                      \
+                 __LINE__,                      \
+                 message);                      \
+        minunit_status = 1;                     \
+        return;                                 \
+    })
+
+#define ASSERT_GE(inParam1, inParam2, message)   \
+    MU__SAFE_BLOCK(if(!(inParam1 >= inParam2)) { \
+        snprintf(minunit_last_message,           \
+                 MINUNIT_MESSAGE_LEN,            \
+                 "%s failed:\n\t%s:%d: %s",      \
+                 __func__,                       \
+                 __FILE__,                       \
+                 __LINE__,                       \
+                 message);                       \
+        minunit_status = 1;                      \
+        return;                                  \
+    })
+
+#define ASSERT_GT(inParam1, inParam2, message)  \
+    MU__SAFE_BLOCK(if(!(inParam1 > inParam2)) { \
+        snprintf(minunit_last_message,          \
+                 MINUNIT_MESSAGE_LEN,           \
+                 "%s failed:\n\t%s:%d: %s",     \
+                 __func__,                      \
+                 __FILE__,                      \
+                 __LINE__,                      \
+                 message);                      \
+        minunit_status = 1;                     \
+        return;                                 \
+    })
+
 // Verifies that the difference between inParam1 and inParam2 does not exceed the absolute error
 // bound inAbsErr.
 #define ASSERT_NEAR(inParam1, inParam2, inAbsErr, message)             \
@@ -271,41 +310,41 @@ extern void (*minunit_teardown)(void);
                        return;                                                             \
                    })
 
-#define ASSERT_STREQ(expected, result)                                                \
-    MU__SAFE_BLOCK(                                                                   \
-        const char *minunit_tmp_e = expected; const char *minunit_tmp_r = result;     \
-        if(!minunit_tmp_e) { minunit_tmp_e = "<null pointer>"; } if(!minunit_tmp_r) { \
-            minunit_tmp_r = "<null pointer>";                                         \
-        } if(strcmp(minunit_tmp_e, minunit_tmp_r)) {                                  \
-            snprintf(minunit_last_message,                                            \
-                     MINUNIT_MESSAGE_LEN,                                             \
-                     "%s failed:\n\t%s:%d: '%s' expected but was '%s'",               \
-                     __func__,                                                        \
-                     __FILE__,                                                        \
-                     __LINE__,                                                        \
-                     minunit_tmp_e,                                                   \
-                     minunit_tmp_r);                                                  \
-            minunit_status = 1;                                                       \
-            return;                                                                   \
-        })
+#define ASSERT_STREQ(expected, result)                                                    \
+    MU__SAFE_BLOCK(                                                                       \
+            const char *minunit_tmp_e = expected; const char *minunit_tmp_r = result;     \
+            if(!minunit_tmp_e) { minunit_tmp_e = "<null pointer>"; } if(!minunit_tmp_r) { \
+                minunit_tmp_r = "<null pointer>";                                         \
+            } if(strcmp(minunit_tmp_e, minunit_tmp_r)) {                                  \
+                snprintf(minunit_last_message,                                            \
+                         MINUNIT_MESSAGE_LEN,                                             \
+                         "%s failed:\n\t%s:%d: '%s' expected but was '%s'",               \
+                         __func__,                                                        \
+                         __FILE__,                                                        \
+                         __LINE__,                                                        \
+                         minunit_tmp_e,                                                   \
+                         minunit_tmp_r);                                                  \
+                minunit_status = 1;                                                       \
+                return;                                                                   \
+            })
 
-#define mu_assert_string_eq(expected, result)                                         \
-    MU__SAFE_BLOCK(                                                                   \
-        const char *minunit_tmp_e = expected; const char *minunit_tmp_r = result;     \
-        if(!minunit_tmp_e) { minunit_tmp_e = "<null pointer>"; } if(!minunit_tmp_r) { \
-            minunit_tmp_r = "<null pointer>";                                         \
-        } if(strcmp(minunit_tmp_e, minunit_tmp_r)) {                                  \
-            snprintf(minunit_last_message,                                            \
-                     MINUNIT_MESSAGE_LEN,                                             \
-                     "%s failed:\n\t%s:%d: '%s' expected but was '%s'",               \
-                     __func__,                                                        \
-                     __FILE__,                                                        \
-                     __LINE__,                                                        \
-                     minunit_tmp_e,                                                   \
-                     minunit_tmp_r);                                                  \
-            minunit_status = 1;                                                       \
-            return;                                                                   \
-        })
+#define mu_assert_string_eq(expected, result)                                             \
+    MU__SAFE_BLOCK(                                                                       \
+            const char *minunit_tmp_e = expected; const char *minunit_tmp_r = result;     \
+            if(!minunit_tmp_e) { minunit_tmp_e = "<null pointer>"; } if(!minunit_tmp_r) { \
+                minunit_tmp_r = "<null pointer>";                                         \
+            } if(strcmp(minunit_tmp_e, minunit_tmp_r)) {                                  \
+                snprintf(minunit_last_message,                                            \
+                         MINUNIT_MESSAGE_LEN,                                             \
+                         "%s failed:\n\t%s:%d: '%s' expected but was '%s'",               \
+                         __func__,                                                        \
+                         __FILE__,                                                        \
+                         __LINE__,                                                        \
+                         minunit_tmp_e,                                                   \
+                         minunit_tmp_r);                                                  \
+                minunit_status = 1;                                                       \
+                return;                                                                   \
+            })
 
 /*
  * The following two functions were written by David Robert Nadeau
