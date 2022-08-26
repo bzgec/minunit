@@ -98,8 +98,14 @@ extern void (*minunit_teardown)(void);
     } while(0)
 
 /*  Run test suite and unset setup and teardown functions */
-#define MU_RUN_SUITE(suite_name) \
-    MU__SAFE_BLOCK(minunit_suites++; suite_name(); minunit_setup = NULL; minunit_teardown = NULL;)
+#define MU_RUN_SUITE(suiteFn, suiteName)                                                    \
+    MU__SAFE_BLOCK(                                                                         \
+            if(suiteName != NULL) { printf("Running \"%s\" suite\n", (char *)suiteName); }; \
+            minunit_suites++;                                                               \
+            suiteFn();                                                                      \
+            minunit_setup = NULL;                                                           \
+            minunit_teardown = NULL;                                                        \
+            if(suiteName != NULL) { printf("\n"); })
 
 /*  Configure setup and teardown functions */
 #define MU_SUITE_CONFIGURE(setup_fun, teardown_fun) \
