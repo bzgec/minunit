@@ -60,7 +60,7 @@ extern "C" {
 #endif
 
 #else
-#error "Unable to define timers for an unknown OS."
+//#error "Unable to define timers for an unknown OS."
 #endif
 
 #include <math.h>
