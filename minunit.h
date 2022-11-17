@@ -28,21 +28,22 @@ extern "C" {
 #endif
 
 #if defined(_WIN32)
-  #if defined(_MSC_VER) && _MSC_VER < 1900
-    #define __func__ __FUNCTION__
-  #endif
+#if defined(_MSC_VER) && _MSC_VER < 1900
+#define __func__ __FUNCTION__
+#endif
 
 #elif defined(__unix__) || defined(__unix) || defined(unix) \
         || (defined(__APPLE__) && defined(__MACH__))
 
-  #if __GNUC__ >= 5 && !defined(__STDC_VERSION__)
-  #define __func__ __extension__ __FUNCTION__
-  #endif
+#if __GNUC__ >= 5 && !defined(__STDC_VERSION__)
+#define __func__ __extension__ __FUNCTION__
+#endif
 
 #endif
 
 #include <math.h>
 #include <stdint.h>
+#include <stdlib.h>
 
 /*  Maximum length of last message */
 #define MINUNIT_MESSAGE_LEN 1024u
@@ -83,13 +84,14 @@ extern char minunit_last_message_str[MINUNIT_MESSAGE_LEN];
     } while(0)
 
 /*  Run test suite and unset setup and teardown functions */
-#define MU_RUN_SUITE(inTestSuiteFn, inSuiteName) MINUNIT_run_suite(&inTestSuiteFn, inSuiteName)
+#define MU_RUN_SUITE(inTestSuiteFn, inSuiteName) MINUNIT_run_suite(&(inTestSuiteFn), (inSuiteName))
 
 /*  Configure setup and teardown functions */
-#define MU_SUITE_CONFIGURE(inSetupFn, inTeardownFn) MINUNIT_suite_configure(inSetupFn, inTeardownFn)
+#define MU_SUITE_CONFIGURE(inSetupFn, inTeardownFn) \
+    MINUNIT_suite_configure((inSetupFn), (inTeardownFn))
 
 /*  Test runner */
-#define MU_RUN_TEST(inTestFn) MINUNIT_run_test(&inTestFn)
+#define MU_RUN_TEST(inTestFn) MINUNIT_run_test(&(inTestFn))
 
 /*  Report */
 #define MU_REPORT() MINUNIT_report()
@@ -97,90 +99,96 @@ extern char minunit_last_message_str[MINUNIT_MESSAGE_LEN];
 #define MU_EXIT_CODE MINUNIT_getNumbOfFailedTests()
 
 /*  Assertions */
-#define mu_check(test)                                                \
-    MU__SAFE_BLOCK(if(!(test)) {                                      \
-        MINUNIT_failAndPrintMsg(__func__, __FILE__, __LINE__, inMsg); \
-        return;                                                       \
+#define mu_check(test)                                                  \
+    MU__SAFE_BLOCK(if(!(test)) {                                        \
+        MINUNIT_failAndPrintMsg(__func__, __FILE__, __LINE__, (inMsg)); \
+        return;                                                         \
     })
 
-#define mu_assert(test, inMsg)                                        \
-    MU__SAFE_BLOCK(if(!(test)) {                                      \
-        MINUNIT_failAndPrintMsg(__func__, __FILE__, __LINE__, inMsg); \
-        return;                                                       \
+#define mu_assert(test, inMsg)                                          \
+    MU__SAFE_BLOCK(if(!(test)) {                                        \
+        MINUNIT_failAndPrintMsg(__func__, __FILE__, __LINE__, (inMsg)); \
+        return;                                                         \
     })
 
 #define FAIL(inMsg) \
-    MU__SAFE_BLOCK(MINUNIT_failAndPrintMsg(__func__, __FILE__, __LINE__, inMsg); return;)
+    MU__SAFE_BLOCK(MINUNIT_failAndPrintMsg(__func__, __FILE__, __LINE__, (inMsg)); return;)
 
-#define mu_fail(message) FAIL(message)
+#define mu_fail(message) FAIL((message))
 
-#define ASSERT_EQ(inParam1, inParam2, inMsg)                          \
-    MU__SAFE_BLOCK(if(!(inParam1 == inParam2)) {                      \
-        MINUNIT_failAndPrintMsg(__func__, __FILE__, __LINE__, inMsg); \
-        return;                                                       \
+#define ASSERT_EQ(inParam1, inParam2, inMsg)                            \
+    MU__SAFE_BLOCK(if(!((inParam1) == (inParam2))) {                    \
+        MINUNIT_failAndPrintMsg(__func__, __FILE__, __LINE__, (inMsg)); \
+        return;                                                         \
     })
 
-#define ASSERT_NE(inParam1, inParam2, inMsg)                          \
-    MU__SAFE_BLOCK(if(!(inParam1 != inParam2)) {                      \
-        MINUNIT_failAndPrintMsg(__func__, __FILE__, __LINE__, inMsg); \
-        return;                                                       \
+#define ASSERT_NE(inParam1, inParam2, inMsg)                            \
+    MU__SAFE_BLOCK(if(!((inParam1) != (inParam2))) {                    \
+        MINUNIT_failAndPrintMsg(__func__, __FILE__, __LINE__, (inMsg)); \
+        return;                                                         \
     })
 
-#define ASSERT_LE(inParam1, inParam2, inMsg)                          \
-    MU__SAFE_BLOCK(if(!(inParam1 <= inParam2)) {                      \
-        MINUNIT_failAndPrintMsg(__func__, __FILE__, __LINE__, inMsg); \
-        return;                                                       \
+#define ASSERT_LE(inParam1, inParam2, inMsg)                            \
+    MU__SAFE_BLOCK(if(!((inParam1) <= (inParam2))) {                    \
+        MINUNIT_failAndPrintMsg(__func__, __FILE__, __LINE__, (inMsg)); \
+        return;                                                         \
     })
 
-#define ASSERT_LT(inParam1, inParam2, inMsg)                          \
-    MU__SAFE_BLOCK(if(!(inParam1 < inParam2)) {                       \
-        MINUNIT_failAndPrintMsg(__func__, __FILE__, __LINE__, inMsg); \
-        return;                                                       \
+#define ASSERT_LT(inParam1, inParam2, inMsg)                            \
+    MU__SAFE_BLOCK(if(!((inParam1) < (inParam2))) {                     \
+        MINUNIT_failAndPrintMsg(__func__, __FILE__, __LINE__, (inMsg)); \
+        return;                                                         \
     })
 
-#define ASSERT_GE(inParam1, inParam2, inMsg)                          \
-    MU__SAFE_BLOCK(if(!(inParam1 >= inParam2)) {                      \
-        MINUNIT_failAndPrintMsg(__func__, __FILE__, __LINE__, inMsg); \
-        return;                                                       \
+#define ASSERT_GE(inParam1, inParam2, inMsg)                            \
+    MU__SAFE_BLOCK(if(!((inParam1) >= (inParam2))) {                    \
+        MINUNIT_failAndPrintMsg(__func__, __FILE__, __LINE__, (inMsg)); \
+        return;                                                         \
     })
 
-#define ASSERT_GT(inParam1, inParam2, inMsg)                          \
-    MU__SAFE_BLOCK(if(!(inParam1 > inParam2)) {                       \
-        MINUNIT_failAndPrintMsg(__func__, __FILE__, __LINE__, inMsg); \
-        return;                                                       \
+#define ASSERT_GT(inParam1, inParam2, inMsg)                            \
+    MU__SAFE_BLOCK(if(!((inParam1) > (inParam2))) {                     \
+        MINUNIT_failAndPrintMsg(__func__, __FILE__, __LINE__, (inMsg)); \
+        return;                                                         \
     })
 
 // Verifies that the difference between inParam1 and inParam2 does not exceed the absolute error
 // bound inAbsErr.
-#define ASSERT_NEAR(inParam1, inParam2, inAbsErr, inMsg)               \
-    MU__SAFE_BLOCK(if(!(inAbsErr > fabs(1.0 * inParam1 - inParam2))) { \
-        MINUNIT_failAndPrintMsg(__func__, __FILE__, __LINE__, inMsg);  \
-        return;                                                        \
+#define ASSERT_NEAR_INT(inParam1, inParam2, inAbsErr, inMsg)            \
+    MU__SAFE_BLOCK(if(!((inAbsErr) > abs((inParam1) - (inParam2)))) {   \
+        MINUNIT_failAndPrintMsg(__func__, __FILE__, __LINE__, (inMsg)); \
+        return;                                                         \
     })
 
-#define ASSERT_EQ_INT(inExpected, inResult)                                              \
-    MU__SAFE_BLOCK(if(MINUNIT_assert_int(inExpected, inResult) != MU_testStatus_OK) {    \
-        MINUNIT_failAndPrintMsg(__func__, __FILE__, __LINE__, minunit_last_message_str); \
-        return;                                                                          \
+#define ASSERT_NEAR_DOUBLE(inParam1, inParam2, inAbsErr, inMsg)         \
+    MU__SAFE_BLOCK(if(!((inAbsErr) > fabs((inParam1) - (inParam2)))) {  \
+        MINUNIT_failAndPrintMsg(__func__, __FILE__, __LINE__, (inMsg)); \
+        return;                                                         \
     })
 
-#define mu_assert_int_eq(expected, result) ASSERT_EQ_INT(expected, result)
+#define ASSERT_EQ_INT(inExpected, inResult)                                                \
+    MU__SAFE_BLOCK(if(MINUNIT_assert_int((inExpected), (inResult)) != MU_testStatus_OK) {  \
+        MINUNIT_failAndPrintMsg(__func__, __FILE__, __LINE__, (minunit_last_message_str)); \
+        return;                                                                            \
+    })
 
-#define ASSERT_EQ_DOUBLE(inExpected, inResult)                                           \
-    MU__SAFE_BLOCK(if(MINUNIT_assert_double(inExpected, inResult) != MU_testStatus_OK) { \
-        MINUNIT_failAndPrintMsg(__func__, __FILE__, __LINE__, minunit_last_message_str); \
-        return;                                                                          \
+#define mu_assert_int_eq(expected, result) ASSERT_EQ_INT((expected), (result))
+
+#define ASSERT_EQ_DOUBLE(inExpected, inResult)                                               \
+    MU__SAFE_BLOCK(if(MINUNIT_assert_double((inExpected), (inResult)) != MU_testStatus_OK) { \
+        MINUNIT_failAndPrintMsg(__func__, __FILE__, __LINE__, (minunit_last_message_str));   \
+        return;                                                                              \
     })
 
 #define mu_assert_double_eq(expected, result) ASSERT_EQ_DOUBLE(expected, result)
 
-#define ASSERT_STREQ(inExpected, inResult)                                               \
-    MU__SAFE_BLOCK(if(MINUNIT_assert_streq(inExpected, inResult) != MU_testStatus_OK) {  \
-        MINUNIT_failAndPrintMsg(__func__, __FILE__, __LINE__, minunit_last_message_str); \
-        return;                                                                          \
+#define ASSERT_STREQ(inExpected, inResult)                                                  \
+    MU__SAFE_BLOCK(if(MINUNIT_assert_streq((inExpected), (inResult)) != MU_testStatus_OK) { \
+        MINUNIT_failAndPrintMsg(__func__, __FILE__, __LINE__, (minunit_last_message_str));  \
+        return;                                                                             \
     })
 
-#define mu_assert_string_eq(expected, result) ASSERT_STREQ(expected, result)
+#define mu_assert_string_eq(expected, result) ASSERT_STREQ((expected), (result))
 
 /*
  * The following two functions were written by David Robert Nadeau
