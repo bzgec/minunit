@@ -28,38 +28,39 @@ extern "C" {
 #endif
 
 #if defined(_WIN32)
-  #include <Windows.h>
-  #if defined(_MSC_VER) && _MSC_VER < 1900
-  #define snprintf _snprintf
-  #endif
+#include <Windows.h>
+#if defined(_MSC_VER) && _MSC_VER < 1900
+#define(void) snprintf _(void) snprintf
+#endif
 
 #elif defined(__unix__) || defined(__unix) || defined(unix) \
         || (defined(__APPLE__) && defined(__MACH__))
 
-  /* Change POSIX C SOURCE version for pure c99 compilers */
-  #if !defined(_POSIX_C_SOURCE) || _POSIX_C_SOURCE < 200112L
-  #undef _POSIX_C_SOURCE
-  #define _POSIX_C_SOURCE 200112L
-  #endif
+/* Change POSIX C SOURCE version for pure c99 compilers */
+#if !defined(_POSIX_C_SOURCE) || _POSIX_C_SOURCE < 200112L
+#undef _POSIX_C_SOURCE           // cppcheck-suppress[misra-c2012-20.5, misra-c2012-21.1]
+#define _POSIX_C_SOURCE 200112L  // cppcheck-suppress[misra-c2012-21.1]
+#endif
 
-  #include <string.h>
-  #include <sys/resource.h>
-  #include <sys/time.h> /* gethrtime(), gettimeofday() */
-  #include <sys/times.h>
-  #include <time.h>   /* clock_gettime(), time() */
-  #include <unistd.h> /* POSIX flags */
+#include <sys/resource.h>
+#include <sys/time.h>  // gethrtime(), gettimeofday()
+#include <sys/times.h>
+#include <time.h> /* clock_gettime(), time()*/  // cppcheck-suppress[misra-c2012-21.10]
+#include <unistd.h>                             // POSIX flags
 
-  #if defined(__MACH__) && defined(__APPLE__)
-  #include <mach/mach.h>
-  #include <mach/mach_time.h>
-  #endif
+#if defined(__MACH__) && defined(__APPLE__)
+#include <mach/mach.h>
+#include <mach/mach_time.h>
+#endif
 
 #else
 #error "Unable to define timers for an unknown OS."
 #endif
 
+#include <inttypes.h>
 #include <stdbool.h>
-#include <stdio.h>
+#include <stdio.h>  // cppcheck-suppress[misra-c2012-21.6]
+#include <string.h>
 
 #include "minunit.h"
 
@@ -73,8 +74,8 @@ static uint32_t minunit_cntFailures = 0u;
 static MU_testStatus_E minunit_testStatus = MU_testStatus_OK;
 
 /*  Timers */
-static double minunit_real_timer_start = 0;
-static double minunit_proc_timer_start = 0;
+static double minunit_real_timer_start = 0.0;
+static double minunit_proc_timer_start = 0.0;
 
 /*  Last message */
 static char minunit_last_message[MINUNIT_MESSAGE_LEN];
@@ -88,14 +89,14 @@ typedef void (*MINUNIT_test_suite_fn_T)(void);
 
 static void MINUNIT_fail_test(void) {
     minunit_cntFailures++;
-    printf("F");
-    printf("\n%s\n", minunit_last_message);
+    (void)printf("F");
+    (void)printf("\n%s\n", minunit_last_message);
 }
 
 void MINUNIT_run_suite(MINUNIT_test_suite_fn_T inTestSuiteFn, const char *inSuiteName) {
     if(inSuiteName != NULL) {
-        printf("Running \"%s\" suite\n", (char *)inSuiteName);
-        fflush(stdout);
+        (void)printf("Running \"%s\" suite\n", (const char *)inSuiteName);
+        (void)fflush(stdout);
     };
 
     minunit_cntSuites++;
@@ -106,7 +107,7 @@ void MINUNIT_run_suite(MINUNIT_test_suite_fn_T inTestSuiteFn, const char *inSuit
     minunit_teardown = NULL;
 
     if(inSuiteName != NULL) {
-        putchar('\n');
+        (void)putchar('\n');
     }
 }
 
@@ -116,9 +117,9 @@ void MINUNIT_suite_configure(MINUNIT_setup_fn_T inSetupFn, MINUNIT_teardown_fn_T
 }
 
 void MINUNIT_run_test(MINUNIT_test_fn_T inTestFn) {
-    printf(".");
+    (void)printf(".");
 
-    if(minunit_real_timer_start == 0 && minunit_proc_timer_start == 0) {
+    if((minunit_real_timer_start == 0.0) && (minunit_proc_timer_start == 0.0)) {
         minunit_real_timer_start = mu_timer_real();
         minunit_proc_timer_start = mu_timer_cpu();
     };
@@ -126,6 +127,7 @@ void MINUNIT_run_test(MINUNIT_test_fn_T inTestFn) {
     minunit_testStatus = MU_testStatus_OK;
     minunit_cntTests++;
 
+    // cppcheck-suppress[misra-c2012-15.4]
     do {
         if(minunit_setup != NULL) {
             (*minunit_setup)();
@@ -154,24 +156,24 @@ void MINUNIT_run_test(MINUNIT_test_fn_T inTestFn) {
         }
     } while(false);
 
-    fflush(stdout);
+    (void)fflush(stdout);
 }
 
 void MINUNIT_report(void) {
     double minunit_real_timer_end;
     double minunit_proc_timer_end;
 
-    printf("\n\n%u tests from %u test suites ran, %u failures\n",
-           minunit_cntTests,
-           minunit_cntSuites,
-           minunit_cntFailures);
+    (void)printf("\n\n%" PRIu32 " tests from %" PRIu32 " test suites ran, %" PRIu32 " failures\n",
+                 minunit_cntTests,
+                 minunit_cntSuites,
+                 minunit_cntFailures);
 
     minunit_real_timer_end = mu_timer_real();
     minunit_proc_timer_end = mu_timer_cpu();
 
-    printf("\nFinished in %.8f seconds (real) %.8f seconds (proc)\n\n",
-           minunit_real_timer_end - minunit_real_timer_start,
-           minunit_proc_timer_end - minunit_proc_timer_start);
+    (void)printf("\nFinished in %.8f seconds (real) %.8f seconds (proc)\n\n",
+                 minunit_real_timer_end - minunit_real_timer_start,
+                 minunit_proc_timer_end - minunit_proc_timer_start);
 }
 
 uint32_t MINUNIT_getNumbOfFailedTests(void) {
@@ -182,13 +184,13 @@ void MINUNIT_failAndPrintMsg(const char *inFuncName,
                              const char *inFileName,
                              int inLine,
                              const char *inMsg) {
-    snprintf(minunit_last_message,
-             MINUNIT_MESSAGE_LEN,
-             "%s failed:\n\t%s:%d: %s",
-             inFuncName,
-             inFileName,
-             inLine,
-             inMsg);
+    (void)snprintf(minunit_last_message,
+                   MINUNIT_MESSAGE_LEN,
+                   "%s failed:\n\t%s:%d: %s",
+                   inFuncName,
+                   inFileName,
+                   inLine,
+                   inMsg);
 
     minunit_testStatus = MU_testStatus_FAIL;
 }
@@ -198,11 +200,11 @@ MU_testStatus_E MINUNIT_assert_int(int inExpected, int inResult) {
 
     if(inExpected != inResult) {
         // Differ
-        snprintf(minunit_last_message_str,
-                 MINUNIT_MESSAGE_LEN,
-                 "%d expected but was %d",
-                 inExpected,
-                 inResult);
+        (void)snprintf(minunit_last_message_str,
+                       MINUNIT_MESSAGE_LEN,
+                       "%d expected but was %d",
+                       inExpected,
+                       inResult);
     } else {
         // Same
         testFail = MU_testStatus_OK;
@@ -215,13 +217,13 @@ MU_testStatus_E MINUNIT_assert_double(double inExpected, double inResult) {
     int minunit_significant_figures = 1 - log10(MINUNIT_EPSILON);
 
     if(fabs(inExpected - inResult) > MINUNIT_EPSILON) {  // Differ
-        snprintf(minunit_last_message_str,
-                 MINUNIT_MESSAGE_LEN,
-                 "%.*g expected but was %.*g",
-                 minunit_significant_figures,
-                 inExpected,
-                 minunit_significant_figures,
-                 inResult);
+        (void)snprintf(minunit_last_message_str,
+                       MINUNIT_MESSAGE_LEN,
+                       "%.*g expected but was %.*g",
+                       minunit_significant_figures,
+                       inExpected,
+                       minunit_significant_figures,
+                       inResult);
     } else {
         // Same
         testFail = MU_testStatus_OK;
@@ -248,11 +250,11 @@ MU_testStatus_E MINUNIT_assert_streq(const char *inExpected, const char *inResul
 
     if(strcmp(tmp_expected, tmp_result) != 0) {
         // Differ
-        snprintf(minunit_last_message_str,
-                 MINUNIT_MESSAGE_LEN,
-                 "'%s' expected but was '%s'",
-                 tmp_expected,
-                 tmp_result);
+        (void)snprintf(minunit_last_message_str,
+                       MINUNIT_MESSAGE_LEN,
+                       "'%s' expected but was '%s'",
+                       tmp_expected,
+                       tmp_result);
     } else {
         // Same
         testFail = MU_testStatus_OK;
@@ -262,7 +264,7 @@ MU_testStatus_E MINUNIT_assert_streq(const char *inExpected, const char *inResul
 
 /*
  * The following two functions were written by David Robert Nadeau
- * from http://NadeauSoftware.com/ and distributed under the
+ * from http:/ /NadeauSoftware.com/ and distributed under the
  * Creative Commons Attribution 3.0 Unported License
  */
 
@@ -327,8 +329,9 @@ double mu_timer_real(void) {
 #else
         const clockid_t id = (clockid_t)-1; /* Unknown. */
 #endif /* CLOCK_* */
-        if(id != (clockid_t)-1 && clock_gettime(id, &ts) != -1)
+        if(id != (clockid_t)-1 && clock_gettime(id, &ts) != -1) {
             return (double)ts.tv_sec + (double)ts.tv_nsec / 1000000000.0;
+        }
         /* Fall thru. */
     }
 #endif /* _POSIX_TIMERS */
@@ -383,16 +386,18 @@ double mu_timer_cpu(void) {
 #else
         id = (clockid_t)-1;
 #endif
-        if(id != (clockid_t)-1 && clock_gettime(id, &ts) != -1)
+        if(id != (clockid_t)-1 && clock_gettime(id, &ts) != -1) {
             return (double)ts.tv_sec + (double)ts.tv_nsec / 1000000000.0;
+        }
     }
 #endif
 
 #if defined(RUSAGE_SELF)
     {
         struct rusage rusage;
-        if(getrusage(RUSAGE_SELF, &rusage) != -1)
+        if(getrusage(RUSAGE_SELF, &rusage) != -1) {
             return (double)rusage.ru_utime.tv_sec + (double)rusage.ru_utime.tv_usec / 1000000.0;
+        }
     }
 #endif
 
@@ -400,16 +405,18 @@ double mu_timer_cpu(void) {
     {
         const double ticks = (double)sysconf(_SC_CLK_TCK);
         struct tms tms;
-        if(times(&tms) != (clock_t)-1)
+        if(times(&tms) != (clock_t)-1) {
             return (double)tms.tms_utime / ticks;
+        }
     }
 #endif
 
 #if defined(CLOCKS_PER_SEC)
     {
         clock_t cl = clock();
-        if(cl != (clock_t)-1)
+        if(cl != (clock_t)-1) {
             return (double)cl / (double)CLOCKS_PER_SEC;
+        }
     }
 #endif
 
