@@ -29,14 +29,14 @@ extern "C" {
 
 #if defined(_WIN32)
 #if defined(_MSC_VER) && _MSC_VER < 1900
-#define __func__ __FUNCTION__
+#define __func__ __FUNCTION__  // cppcheck-suppress[misra-c2012-21.1]
 #endif
 
 #elif defined(__unix__) || defined(__unix) || defined(unix) \
         || (defined(__APPLE__) && defined(__MACH__))
 
 #if __GNUC__ >= 5 && !defined(__STDC_VERSION__)
-#define __func__ __extension__ __FUNCTION__
+#define __func__ __extension__ __FUNCTION__  // cppcheck-suppress[misra-c2012-21.1]
 #endif
 
 #else
@@ -77,9 +77,10 @@ MU_testStatus_E MINUNIT_assert_double(double inExpected, double inResult);
 extern char minunit_last_message_str[MINUNIT_MESSAGE_LEN];
 
 /*  Definitions */
-#define MU_TEST(method_name) static void method_name(void)
-#define MU_TEST_SUITE(suite_name) void suite_name(void)
+#define MU_TEST(method_name) static void method_name(void)  // cppcheck-suppress[misra-c2012-20.7]
+#define MU_TEST_SUITE(suite_name) void suite_name(void)     // cppcheck-suppress[misra-c2012-20.7]
 
+// cppcheck-suppress[misra-c2012-20.7]
 #define MU__SAFE_BLOCK(block) \
     do {                      \
         block                 \
