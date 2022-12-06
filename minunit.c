@@ -160,20 +160,20 @@ void MINUNIT_run_test(MINUNIT_test_fn_T inTestFn) {
 }
 
 void MINUNIT_report(void) {
-    double minunit_real_timer_end;
-    double minunit_proc_timer_end;
+    //double minunit_real_timer_end;
+    //double minunit_proc_timer_end;
 
     (void)printf("\n\n%" PRIu32 " tests from %" PRIu32 " test suites ran, %" PRIu32 " failures\n",
                  minunit_cntTests,
                  minunit_cntSuites,
                  minunit_cntFailures);
 
-    minunit_real_timer_end = mu_timer_real();
-    minunit_proc_timer_end = mu_timer_cpu();
+    //minunit_real_timer_end = mu_timer_real();
+    //minunit_proc_timer_end = mu_timer_cpu();
 
-    (void)printf("\nFinished in %.8f seconds (real) %.8f seconds (proc)\n\n",
-                 minunit_real_timer_end - minunit_real_timer_start,
-                 minunit_proc_timer_end - minunit_proc_timer_start);
+    //(void)printf("\nFinished in %.8f seconds (real) %.8f seconds (proc)\n\n",
+    //             minunit_real_timer_end - minunit_real_timer_start,
+    //             minunit_proc_timer_end - minunit_proc_timer_start);
 }
 
 uint32_t MINUNIT_getNumbOfFailedTests(void) {
