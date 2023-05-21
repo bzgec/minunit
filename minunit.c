@@ -85,8 +85,6 @@ char minunit_last_message_str[MINUNIT_MESSAGE_LEN];
 static MINUNIT_setup_fn_T minunit_setup = NULL;
 static MINUNIT_setup_fn_T minunit_teardown = NULL;
 
-typedef void (*MINUNIT_test_suite_fn_T)(void);
-
 static void MINUNIT_fail_test(void) {
     minunit_cntFailures++;
     (void)printf("F");
