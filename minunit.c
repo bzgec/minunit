@@ -264,7 +264,7 @@ MU_testStatus_E MINUNIT_assert_streq(const char *inExpected, const char *inResul
 
 /*
  * The following two functions were written by David Robert Nadeau
- * from http:/ /NadeauSoftware.com/ and distributed under the
+ * from http://NadeauSoftware.com/ and distributed under the
  * Creative Commons Attribution 3.0 Unported License
  */
 
