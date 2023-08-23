@@ -100,7 +100,7 @@ extern char minunit_last_message_str[MINUNIT_MESSAGE_LEN];
 #define MU_EXIT_CODE MINUNIT_getNumbOfFailedTests()
 
 /*  Assertions */
-#define mu_check(test)                                                  \
+#define mu_check(test, inMsg)                                           \
     MU__SAFE_BLOCK(if(!(test)) {                                        \
         MINUNIT_failAndPrintMsg(__func__, __FILE__, __LINE__, (inMsg)); \
         return;                                                         \
