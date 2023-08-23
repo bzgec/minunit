@@ -22,10 +22,14 @@ MU_TEST(test_file1) {
 MU_TEST_SUITE(test_suite_file1) {
 	MU_RUN_TEST(test_file1);
 }
+```
 
+```.c
 // file1.h
 void test_suite_file1(void);
+```
 
+```.c
 // file2.c
 #include "file1.h"
 #include "minunit.h"
@@ -44,10 +48,14 @@ MU_TEST(test_file2) {
 MU_TEST_SUITE(test_suite_file2) {
 	MU_RUN_TEST(test_file2);
 }
+```
 
+```.c
 // file2.h
 void test_suite_file2(void);
+```
 
+```.c
 // main.c
 #include "file1.h"
 #include "file2.h"
@@ -62,7 +70,7 @@ int main(int argc, char *argv[]) {
 }
 ```
 
-Check out `example` folder to see a more detailed example. With terminal move to the `example`
+Check out `examples` folder to see a more detailed example. With terminal move to the `examples`
 folder and execute `make run`
 
 Which should produce some thing like:
